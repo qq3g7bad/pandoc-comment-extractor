@@ -17,7 +17,7 @@ These filters are useful for tracking metadata across conversions.
 
 ## 🚀 Usage
 
-### Markdown → DOCX (`md2docx_add_comment.lua`)
+### 🔴 Markdown → DOCX (`md2docx_add_comment.lua`)
 
 Use this script to embed comments into DOCX headers.
 
@@ -36,24 +36,26 @@ $ pandoc input.md -o output.docx --lua-filter=md2docx_add_comment.lua
 
 **DOCX Output:**
 
-- The header "Feature Specification" will have a comment attached: `COMMENT EXAMPLE`.
+- The header "Section 1" will have a comment attached: `COMMENT EXAMPLE`.
 
 ---
 
-### DOCX → Markdown (`docx2md_add_comment.lua`)
+### 🔵 DOCX → Markdown (`docx2md_add_comment.lua`)
 
 Use this script to extract comments from DOCX and restore them as Markdown comments.\
-⚠️ **Note:** Use the `--track-changes=all` option for extracting DOCX comments.
+
+> [!NOTE]
+> Use the `--track-changes=all` option for extracting DOCX comments.
 
 ```sh
-$ pandoc output.docx -t gfm -o output.md --track-changes=all --lua-filter=docx2md_add_comment.lua
+$ pandoc input.docx -t gfm -o output.md --track-changes=all --lua-filter=docx2md_add_comment.lua
 ```
 
 #### Example
 
 **DOCX Input:**
 
-- A document with a header **"Feature Specification"** containing a comment: `COMMENT EXAMPLE`.
+- A document with a header **"Section 1"** containing a comment: `COMMENT EXAMPLE`.
 
 **Markdown Output:**
 
@@ -64,7 +66,7 @@ $ pandoc output.docx -t gfm -o output.md --track-changes=all --lua-filter=docx2m
 
 ---
 
-## Installation
+## 🟡 Installation
 
 Clone this repository and use the Lua filters with Pandoc:
 
