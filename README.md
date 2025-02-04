@@ -71,10 +71,10 @@ $ pandoc input.docx -t gfm -o output.md --track-changes=all --lua-filter=docx2md
 Clone this repository and use the Lua filters with Pandoc:
 
 ```sh
-$ git clone https://github.com/yourusername/pandoc-comment-extractor.git
+$ git clone https://github.com/qq3g7bad/pandoc-comment-extractor.git
 $ cd pandoc-comment-extractor
 $ pandoc input.md -o output.docx --lua-filter=md2docx_add_comment.lua
-$ pandoc output.docx -t gfm -o output.md --track-changes=all --lua-filter=docx2md_add_comment.lua
+$ pandoc input.docx -t gfm -o output.md --track-changes=all --lua-filter=docx2md_add_comment.lua
 ```
 
 
