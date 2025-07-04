@@ -1,5 +1,5 @@
 --
--- @file    docx2md_add_tag_comment.lua
+-- @file    docx2md_add_comment.lua
 -- @brief   pandoc-comment-extractor
 -- @details
 --
@@ -9,35 +9,31 @@
 -- * NOTE: Use `--track-changes=all` option for extracting docx comments.
 --
 -- ```sh
--- pandoc output.docx -t gfm -o output.md --track-changes=all --lua-filter=./docx2md_add_tag_comment.lua
+-- pandoc input.docx -t gfm -o output.md --track-changes=all --lua-filter=./docx2md_add_comment.lua
 -- ```
 --
 
 
 --
--- @brief Extract tag data implemented in headers
+-- @brief Extract comments implemented in headers
 --
 function Header(el)
-
-  local section_title = ""
   local comment = nil
+  local non_comment_content = {}
+
   for _, data in ipairs(el.content) do
-
-    -- extract comment text by searching a comment-start tag
-    if data.attr and data.attr.classes then
-      for i, class in ipairs(data.attr.classes) do
-        if class == "comment-start" then
-          comment = data.content[i].text
-        end
+    if data.t == "Span" and pandoc.List(data.attr.classes):includes("comment-start") then
+      local comment_parts = {}
+      for _, inline_el in ipairs(data.c) do
+        table.insert(comment_parts, pandoc.utils.stringify(inline_el))
       end
-    end
-
-    -- extract comment text
-    if data.text then
-      section_title = section_title .. " " .. data.text
+      comment = table.concat(comment_parts)
+    else
+      table.insert(non_comment_content, data)
     end
   end
-  section_title = string.rep("#", el.level) .. section_title
+
+  local section_title = string.rep("#", el.level) .. " " .. pandoc.utils.stringify(non_comment_content)
 
   if comment then
     return {
