@@ -40,6 +40,44 @@ function Header(el)
       pandoc.RawBlock("markdown", "<!-- " .. comment .. " -->\n" .. section_title)
     }
   end
+
+  return el
+end
+
+--
+-- @brief Extract comments implemented in paragraphs
+--
+function Para(el)
+  local new_inlines = {}
+  local pending_comment = nil
+
+  for _, inline in ipairs(el.content) do
+    if inline.t == "Span" and inline.attr and inline.attr.classes then
+      local classes = pandoc.List(inline.attr.classes)
+
+      if classes:includes("comment-start") then
+        local parts = {}
+        for _, c in ipairs(inline.c) do
+          table.insert(parts, pandoc.utils.stringify(c))
+        end
+        pending_comment = table.concat(parts)
+
+      elseif classes:includes("comment-end") then
+      else
+        table.insert(new_inlines, inline)
+      end
+
+    else
+      table.insert(new_inlines, inline)
+
+      if pending_comment then
+        table.insert(new_inlines, pandoc.RawInline("markdown", " <!-- " .. pending_comment .. " --> "))
+        pending_comment = nil
+      end
+    end
+  end
+
+  el.content = new_inlines
   return el
 end
 
