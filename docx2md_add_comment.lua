@@ -14,6 +14,26 @@
 --
 
 
+local function format_comment_with_author(span)
+  local comment_parts = {}
+  for _, inline_el in ipairs(span.c or {}) do
+    table.insert(comment_parts, pandoc.utils.stringify(inline_el))
+  end
+
+  local comment_text = table.concat(comment_parts)
+  local author = nil
+
+  if span.attr and span.attr.attributes then
+    author = span.attr.attributes["author"]
+  end
+
+  if author and author ~= "" then
+    return "[" .. author .. "] " .. comment_text
+  end
+
+  return comment_text
+end
+
 --
 -- @brief Extract comments implemented in headers
 --
@@ -23,11 +43,7 @@ function Header(el)
 
   for _, data in ipairs(el.content) do
     if data.t == "Span" and pandoc.List(data.attr.classes):includes("comment-start") then
-      local comment_parts = {}
-      for _, inline_el in ipairs(data.c) do
-        table.insert(comment_parts, pandoc.utils.stringify(inline_el))
-      end
-      comment = table.concat(comment_parts)
+      comment = format_comment_with_author(data)
     else
       table.insert(non_comment_content, data)
     end
@@ -56,11 +72,7 @@ function Para(el)
       local classes = pandoc.List(inline.attr.classes)
 
       if classes:includes("comment-start") then
-        local parts = {}
-        for _, c in ipairs(inline.c) do
-          table.insert(parts, pandoc.utils.stringify(c))
-        end
-        pending_comment = table.concat(parts)
+        pending_comment = format_comment_with_author(inline)
 
       elseif classes:includes("comment-end") then
       else
@@ -80,4 +92,3 @@ function Para(el)
   el.content = new_inlines
   return el
 end
-
