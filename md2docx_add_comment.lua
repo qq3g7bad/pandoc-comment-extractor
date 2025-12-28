@@ -1,5 +1,5 @@
 --
--- @file    md2docx_add_tag_comment.lua
+-- @file    md2docx_add_comment.lua
 -- @brief   pandoc-comment-extractor
 -- @details
 --
@@ -8,12 +8,22 @@
 -- * Use this script as a Pandoc lua filter with the following command:
 --
 -- ```sh
--- pandoc convert_target.md -o result.docx --lua-filter=md2docx_add_tag_comment.lua
+-- pandoc convert_target.md -o result.docx --lua-filter=md2docx_add_comment.lua
+-- ```
+--
+-- ## Configuration
+--
+-- * You can customize the author name by setting the PANDOC_COMMENT_AUTHOR environment variable:
+--
+-- ```sh
+-- export PANDOC_COMMENT_AUTHOR="qq3g7bad"
+-- pandoc input.md -o output.docx --lua-filter=md2docx_add_comment.lua
 -- ```
 --
 
 local comment_id = 1          -- This is needed for opening the output docx file in LibreOffice Writer
 local extracted_comment = nil
+local DEFAULT_AUTHOR = os.getenv("PANDOC_COMMENT_AUTHOR") or "Unknown Author"
 
 --
 -- @brief Get time for comments
@@ -47,7 +57,7 @@ function Header(el)
   if extracted_comment then
     local comment_span = pandoc.Span(
       { pandoc.Str(extracted_comment.text) },
-      { ["class"] = "comment-start", ["id"] = extracted_comment.id, ["author"] = "shtracer", ["date"] = format_iso8601() }
+      { ["class"] = "comment-start", ["id"] = extracted_comment.id, ["author"] = DEFAULT_AUTHOR, ["date"] = format_iso8601() }
     )
     local comment_end = pandoc.Span(
       {},
